@@ -27,8 +27,30 @@ const registerUser = asyncHandler(
             throw new ApiError(400, "Avatar file is required")
         }
 
-        const avatar = await uploadToCloudinary(avatarLocalPath)
-        let coverImg = await uploadToCloudinary(coverImgLocalPath)
+        // const avatar = await uploadToCloudinary(avatarLocalPath)
+        // const coverImg = await uploadToCloudinary(coverImgLocalPath)
+
+        let avatar;
+        try {
+            avatar = await uploadToCloudinary(avatarLocalPath);
+            if (!avatar) {
+                throw new ApiError(400, "Avatar file is required")
+            }
+        } catch (error) {
+            throw new ApiError(500, error.message || "Failed to upload avatar file to cloud");
+        }
+
+        let coverImg = null;
+        if (coverImgLocalPath) {
+            try {
+                coverImg = await uploadToCloudinary(coverImgLocalPath);
+                if (!coverImg) {
+                    console.log('Cover image upload failed, proceeding without cover image');
+                }
+            } catch (error) {
+                console.log('Failed to upload cover image:', error);
+            }
+        }
 
         const user = await User.create({
             fullName,
