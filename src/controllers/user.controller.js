@@ -1,7 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+    uploadToCloudinary,
+    deleteFromCloudinary,
+} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -264,7 +267,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(200, req.user, "Current user fetched successfully")
         );
-    // .json(200, req.user, "Current user fetched successfully")
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -303,10 +305,16 @@ const updateAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Avatar file is missing");
     }
 
+    try {
+        await deleteFromCloudinary(req.user?.public_id);
+    } catch (error) {
+        throw new ApiError(400, "Error in Cloudinary operations");
+    }
+
     const avatar = await uploadToCloudinary(avatarLocalPath);
 
     if (!avatar.url) {
-        throw new ApiError(500, "Failed to upload on cloudinary");
+        throw new ApiError(400, "Failed to upload on cloudinary");
     }
 
     const newAvatar = await User.findByIdAndUpdate(
