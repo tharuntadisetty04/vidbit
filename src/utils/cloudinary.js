@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import dotenv from "dotenv";
-import { ApiError } from "./ApiError";
+import { ApiError } from "./ApiError.js";
 dotenv.config();
 
 cloudinary.config({
