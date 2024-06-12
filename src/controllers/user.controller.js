@@ -1,10 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import {
-    uploadToCloudinary,
-    deleteFromCloudinary,
-} from "../utils/cloudinary.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -304,12 +301,6 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing");
-    }
-
-    try {
-        await deleteFromCloudinary(req.user?.public_id);
-    } catch (error) {
-        throw new ApiError(400, "Error in Cloudinary operations");
     }
 
     const avatar = await uploadToCloudinary(avatarLocalPath);
