@@ -350,7 +350,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
         req.user?._id,
         {
             $set: {
-                coverImage: coverImage.url,
+                coverImg: coverImage.url,
             },
         },
         { new: true }
